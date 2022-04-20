@@ -1,3 +1,4 @@
+use markdown::*;
 use rocket::*;
 use std::fs::File;
 use std::io::Read;
@@ -10,7 +11,7 @@ fn rocket() -> _ {
 
 #[get("/<path>")]
 async fn getmd(path: &str) -> String {
-    let mdp = "/home/moth/mdblog-be/pubfiles/".to_owned() + path;
+    let mdp = "/pubfiles/".to_owned() + path;
     println!("{}", mdp);
     let mut mdf = File::open(&mdp);
     let mut md = String::new();
