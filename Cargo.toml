@@ -9,3 +9,6 @@ edition = "2021"
 rocket = "0.5.0-rc.1"
 tokio = {"version" = "^1", "features" = ["full"]}
 markdown = "0.3.0"
+toml = "0.5.9"
+serde_derive = "1.0.136"
+serde = "1.0.136"
