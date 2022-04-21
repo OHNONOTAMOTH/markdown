@@ -1,21 +1,23 @@
 use markdown::*;
 use rocket::response::content;
-use rocket::response::content::Html;
+use rocket::response::content::{Html, Css};
 use rocket::*;
 use serde_derive::Deserialize;
 use std::fs::File;
 use std::io::Read;
+use std::ops::Add;
 use tokio::*;
 use toml;
 
 #[derive(Deserialize)]
 struct Config {
     pubdir: String,
+    cssfile: String,
 }
 
 #[launch]
 async fn rocket() -> _ {
-    rocket::build().mount("/", routes![getmd])
+    rocket::build().mount("/", routes![getmd, getcssfile])
 }
 
 #[get("/<path>")]
@@ -27,8 +29,18 @@ fn getmd(path: &str) -> Html<String> {
 
     mdf.unwrap().read_to_string(&mut md);
 
-    let html = gethtm(&md);
-    return html;
+    let html = addcss(gethtm(&md));
+    println!("{}", html);
+    return content::Html(html);
+}
+
+#[get("/css.css")]
+fn getcssfile() -> Css<String> {
+    let css = File::open(getconf().unwrap().cssfile);
+    let mut csstext = String::new();
+    css.unwrap().read_to_string(&mut csstext);
+    println!("{}", csstext);
+    content::Css(csstext)
 }
 
 fn getconf() -> Result<Config, toml::de::Error> {
@@ -36,11 +48,33 @@ fn getconf() -> Result<Config, toml::de::Error> {
     let mut cString = String::new();
 
     cFile.unwrap().read_to_string(&mut cString);
-
+    println!("a");
     //let config: Result<Config, toml::de::Error> = toml::from_str(&cString);
     return toml::from_str(&cString);
 }
 
-fn gethtm(md: &str) -> Html<String> {
-    return content::Html(markdown::to_html(md));
+fn gethtm(md: &str) -> String {
+    println!("b");
+    return markdown::to_html(md);
+}
+
+fn addcss(htm: String) -> String {
+    println!("{}", htm);
+    let mut ohtml = htm.clone();
+    let mut h = String::new();
+    let hh = h.clone().add(&("
+        <head>
+            <link rel=\u{0022}stylesheet\u{0022} type=\u{0022}text/css;charset=utf-8\u{0022} href=\u{0022}css.css\u{0022}>
+        </head>
+        
+        <body>".to_owned()
+        + 
+        &htm
+        + 
+        &"</body>".to_owned()));
+    //h.add(&htm);
+    //h.add("</body>");
+    ohtml.insert_str(htm.len(), "</body>");
+    println!("{}", ohtml);
+    return hh;
 }

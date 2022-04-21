@@ -12,4 +12,4 @@ setup:
 
 ### todo list:
 
-- [] css support
+- [] favicon support
