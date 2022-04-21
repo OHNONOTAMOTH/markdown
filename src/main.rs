@@ -1,6 +1,7 @@
 use markdown::*;
 use rocket::response::content;
-use rocket::response::content::{Html, Css};
+use rocket::response::content::{Html, Css, Custom};
+use rocket::http::ContentType;
 use rocket::*;
 use serde_derive::Deserialize;
 use std::fs::File;
@@ -13,11 +14,12 @@ use toml;
 struct Config {
     pubdir: String,
     cssfile: String,
+    favicon: String,
 }
 
 #[launch]
 async fn rocket() -> _ {
-    rocket::build().mount("/", routes![getmd, getcssfile])
+    rocket::build().mount("/", routes![getmd, getcssfile, getfavicon])
 }
 
 #[get("/<path>")]
@@ -77,4 +79,9 @@ fn addcss(htm: String) -> String {
     ohtml.insert_str(htm.len(), "</body>");
     println!("{}", ohtml);
     return hh;
+}
+
+#[get("/favicon.ico")]
+fn getfavicon() -> File {
+    return File::open(getconf().unwrap().favicon).unwrap();
 }
