@@ -1,4 +1,6 @@
 use markdown::*;
+use rocket::response::content;
+use rocket::response::content::Html;
 use rocket::*;
 use serde_derive::Deserialize;
 use std::fs::File;
@@ -17,7 +19,7 @@ async fn rocket() -> _ {
 }
 
 #[get("/<path>")]
-fn getmd(path: &str) -> String {
+fn getmd(path: &str) -> Html<String> {
     let mdp = getconf().unwrap().pubdir + path;
     println!("{}", mdp);
     let mut mdf = File::open(&mdp);
@@ -25,7 +27,8 @@ fn getmd(path: &str) -> String {
 
     mdf.unwrap().read_to_string(&mut md);
 
-    format!("{}", &md)
+    let html = gethtm(&md);
+    return html;
 }
 
 fn getconf() -> Result<Config, toml::de::Error> {
@@ -36,4 +39,8 @@ fn getconf() -> Result<Config, toml::de::Error> {
 
     //let config: Result<Config, toml::de::Error> = toml::from_str(&cString);
     return toml::from_str(&cString);
+}
+
+fn gethtm(md: &str) -> Html<String> {
+    return content::Html(markdown::to_html(md));
 }
