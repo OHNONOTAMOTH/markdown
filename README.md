@@ -9,3 +9,7 @@ setup:
   
 2. start the server
   `cargo run`
+
+### todo list:
+
+- [] css support
