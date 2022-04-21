@@ -535,7 +535,10 @@ version = "0.1.0"
 dependencies = [
  "markdown",
  "rocket",
+ "serde",
+ "serde_derive",
  "tokio",
+ "toml",
 ]
 
 [[package]]
